@@ -1,4 +1,4 @@
-import requests, sqlite3, datetime, itertools
+import requests, sqlite3, datetime, itertools # type: ignore
 
 global m_nosaukums
 m_nosaukums = ["JANVĀRIS", "FEBRUĀRIS", "MARTS", "APRĪLIS", "MAIJS", "JŪNIJS", "JŪLIJS", "AUGUSTS", "SEPTEMBRIS", "OKTOBRIS", "NOVEMBRIS", "DECEMBRIS"]
@@ -277,6 +277,13 @@ def main():
                         kursors.execute(f'''DELETE FROM vardadienas WHERE persona_id = '{izvele.id}' ''')
                         datubaze.commit()
                         del vardadienas[i]
+                        del izvele
+                        break
+                for i in range(len(vardadienas_grupas)):
+                    if vardadienas_grupas[i] == izvele:
+                        kursors.execute(f'''DELETE FROM vardadienas WHERE persona_id = '{izvele.id}' ''')
+                        datubaze.commit()
+                        del vardadienas_grupas[i]
                         del izvele
                         break
                 print('Persona dzēsta!')
