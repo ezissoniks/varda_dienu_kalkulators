@@ -48,6 +48,7 @@ def main():
     vardadienas = []
     vardadienas_grupas = []
     grupas = []
+    personas_id = 0
     #datubāzes savienojums un izveide, ja datubāze neeksistē
     datubaze = sqlite3.connect('vardadienas.db')
     kursors = datubaze.cursor()
@@ -78,6 +79,11 @@ def main():
             if i[3]:
                 vardadienas_grupas[0].pievienot_uzvardu(i[3])
     
+    for i in itertools.chain(vardadienas, vardadienas_grupas):
+        if i.id > personas_id:
+            personas_id = i.id
+    personas_id += 1
+
     print('\n## VĀRDA DIENU KALKULATORS ##\n')
     print('Funkcijas:\n"-a" - atrast personas vārda dienu\n"-i" - izvēlēties personu no kontaktiem\n"-u" - pievienot vai mainīt izvēlētās personas uzvārdu\n"-g" - pievienot vai mainīt izvēlētās personas piederību grupai\n"-d" - dzēst personu no kontaktiem\n"-k" - atvērt kontaktu grāmatu\n"-b" - beigt programmas darbību\n')
 
@@ -128,8 +134,9 @@ def main():
                             print('Persona ar šo vārdu un uzvārdu jau atrodas kontaktos!')
                         else:
                             #jaunas personas pievienošana kontaktiem, saglabāšana ar vārdu un uzvārdu
-                            vardadienas.insert(0, Vardadiena(len(vardadienas)+len(vardadienas_grupas)+1, ievade, datums))
+                            vardadienas.insert(0, Vardadiena(personas_id, ievade, datums))
                             vardadienas[0].pievienot_uzvardu(u_ievade)
+                            personas_id += 1
                             kursors.execute(f'''INSERT INTO vardadienas VALUES
                                                 ({vardadienas[0].id},'{datums.day}.{datums.month}.','{ievade}','{u_ievade}', '')''')
                             datubaze.commit()
@@ -138,7 +145,8 @@ def main():
                         break
                 if ievades_piekļuve:
                     #personas saglabāšana kontaktos
-                    vardadienas.insert(0, Vardadiena(len(vardadienas)+len(vardadienas_grupas)+1, ievade, datums))
+                    vardadienas.insert(0, Vardadiena(personas_id, ievade, datums))
+                    personas_id += 1
                     kursors.execute(f'''INSERT INTO vardadienas VALUES
                                         ({vardadienas[0].id},'{datums.day}.{datums.month}.','{ievade}','','')''')
                     datubaze.commit()
